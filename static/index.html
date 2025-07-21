@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Detection Upload</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        #result-img { max-width: 100%; margin-top: 20px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Upload an Image for Object Detection</h1>
+    <form id="upload-form">
+        <input type="file" id="image-input" name="image" accept="image/*" required />
+        <button type="submit">Upload & Detect</button>
+    </form>
+    <div id="result">
+        <img id="result-img" src="" alt="Detected Image" style="display:none;" />
+    </div>
+    <script>
+        const form = document.getElementById('upload-form');
+        const resultImg = document.getElementById('result-img');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('image-input');
+            const file = fileInput.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('image', file);
+            resultImg.style.display = 'none';
+            const res = await fetch('/detect', {
+                method: 'POST',
+                body: formData
+            });
+            if (res.ok) {
+                const blob = await res.blob();
+                resultImg.src = URL.createObjectURL(blob);
+                resultImg.style.display = 'block';
+            } else {
+                alert('Detection failed.');
+            }
+        });
+    </script>
+</body>
+</html>
